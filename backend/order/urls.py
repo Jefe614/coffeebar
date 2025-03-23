@@ -1,12 +1,10 @@
-# orders/urls.py
-
-from django.urls import path, include
-from rest_framework.routers import DefaultRouter
-from .views import OrderViewSet
-
-router = DefaultRouter()
-router.register('', OrderViewSet)
+# order/urls.py
+from django.urls import path
+from .views import OrderAPIView, TrackOrderAPIView
 
 urlpatterns = [
-    path('', include(router.urls)),
+    path('orders/', OrderAPIView.as_view(), name='orders-create'),
+    path('orders/track/', TrackOrderAPIView.as_view(), name='orders-track'),
+    # path('orders/<str:order_number>/', OrderAPIView.as_view(), name='orders-update-delete'),
+
 ]

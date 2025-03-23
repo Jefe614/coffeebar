@@ -458,7 +458,7 @@ const Menu = () => {
                   </span>
                   <button 
                     onClick={() => handleAddToCart(item)} 
-                    className="flex items-center space-x-1 bg-orange-500 hover:bg-orange-600 text-white px-3 py-1 rounded-full transition-colors duration-300"
+                    className="flex items-center space-x-1 bg-orange-500 hover:bg-orange-600 text-white px-3 py-1 rounded-full transition-colors duration-300 cursor-pointer"
                   >
                     <ShoppingCartOutlined fontSize="small" />
                     <span>Add</span>
