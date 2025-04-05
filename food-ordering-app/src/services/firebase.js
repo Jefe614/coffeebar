@@ -1,5 +1,4 @@
 // src/services/firebase.js
-
 import { initializeApp } from 'firebase/app';
 import { 
   getAuth, 
@@ -13,7 +12,6 @@ import {
 } from 'firebase/auth';
 
 // Your Firebase configuration
-// Replace these with your actual Firebase project details
 const firebaseConfig = {
     apiKey: import.meta.env.VITE_FIREBASE_API_KEY,
     authDomain: import.meta.env.VITE_FIREBASE_AUTH_DOMAIN,

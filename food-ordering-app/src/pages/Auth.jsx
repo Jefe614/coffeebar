@@ -1,7 +1,7 @@
 // src/pages/Auth.js
 
-import { useState } from "react";
-import { useNavigate } from "react-router-dom";
+import { useState, useEffect } from "react";
+import { useNavigate, useLocation } from "react-router-dom";
 import { useAuth } from "../context/AuthContext";
 import { Google, Email, Lock, Visibility, VisibilityOff } from "@mui/icons-material";
 
@@ -17,6 +17,43 @@ const Auth = () => {
   
   const { signIn, signUp, signInWithGoogle, resetPassword } = useAuth();
   const navigate = useNavigate();
+  const location = useLocation();
+
+  // Extract redirect URL from query params (if any)
+  useEffect(() => {
+    const queryParams = new URLSearchParams(location.search);
+    const redirectMessage = queryParams.get('redirect');
+    
+    if (redirectMessage) {
+      setMessage("Please sign in to continue");
+    }
+  }, [location]);
+
+  const getRedirectUrl = () => {
+    const queryParams = new URLSearchParams(location.search);
+    return queryParams.get('redirect') || "/";
+  };
+
+  // Map Firebase error codes to user-friendly messages
+  const getFriendlyErrorMessage = (errorCode) => {
+    const errorMessages = {
+      'auth/email-already-in-use': 'This email is already registered. Please try signing in instead.',
+      'auth/invalid-email': 'Please enter a valid email address.',
+      'auth/user-not-found': 'No account found with this email. Please check your email or sign up.',
+      'auth/wrong-password': 'Incorrect password. Please try again or reset your password.',
+      'auth/weak-password': 'Password is too weak. Please use at least 6 characters.',
+      'auth/too-many-requests': 'Too many unsuccessful login attempts. Please try again later or reset your password.',
+      'auth/network-request-failed': 'Network error. Please check your internet connection and try again.',
+      'auth/user-disabled': 'This account has been disabled. Please contact support.',
+      'auth/popup-closed-by-user': 'Google sign-in was cancelled. Please try again.'
+    };
+
+    // Extract error code from the full error message
+    const codeMatch = errorCode.match(/\(([^)]+)\)/);
+    const code = codeMatch ? codeMatch[1] : errorCode;
+    
+    return errorMessages[code] || `Authentication error: ${errorCode}`;
+  };
 
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -27,10 +64,13 @@ const Auth = () => {
     try {
       if (mode === "login") {
         await signIn(email, password);
-        navigate("/");
+        navigate(getRedirectUrl());
       } else if (mode === "signup") {
         if (password !== confirmPassword) {
           throw new Error("Passwords do not match");
+        }
+        if (password.length < 6) {
+          throw new Error("Password must be at least 6 characters long");
         }
         await signUp(email, password);
         setMessage("Account created successfully! You can now log in.");
@@ -40,7 +80,8 @@ const Auth = () => {
         setMessage("Password reset email sent! Check your inbox.");
       }
     } catch (error) {
-      setError(error.message);
+      console.error("Auth error:", error);
+      setError(getFriendlyErrorMessage(error.message));
     } finally {
       setLoading(false);
     }
@@ -51,9 +92,10 @@ const Auth = () => {
       setError("");
       setLoading(true);
       await signInWithGoogle();
-      navigate("/");
+      navigate(getRedirectUrl());
     } catch (error) {
-      setError(error.message);
+      console.error("Google sign-in error:", error);
+      setError(getFriendlyErrorMessage(error.message));
     } finally {
       setLoading(false);
     }
@@ -70,8 +112,22 @@ const Auth = () => {
         </div>
 
         {error && (
-          <div className="mb-4 bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded">
-            {error}
+          <div className="mb-4 bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded relative">
+            <span className="block sm:inline">{error}</span>
+            {error.includes("already registered") && (
+              <div className="mt-2">
+                <button
+                  type="button"
+                  onClick={() => {
+                    setMode("login");
+                    setError("");
+                  }}
+                  className="font-medium underline"
+                >
+                  Go to sign in
+                </button>
+              </div>
+            )}
           </div>
         )}
 
@@ -133,6 +189,11 @@ const Auth = () => {
                   </button>
                 </div>
               </div>
+              {mode === "signup" && (
+                <p className="mt-1 text-xs text-gray-500">
+                  Password must be at least 6 characters long
+                </p>
+              )}
             </div>
           )}
 
@@ -163,7 +224,7 @@ const Auth = () => {
             <button
               type="submit"
               disabled={loading}
-              className="w-full flex justify-center py-2 px-4 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-gradient-to-r from-orange-400 to-red-500 hover:from-orange-500 hover:to-red-600 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-orange-500"
+              className="w-full flex justify-center py-2 px-4 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-gradient-to-r from-orange-400 to-red-500 hover:from-orange-500 hover:to-red-600 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-orange-500 disabled:opacity-70"
             >
               {loading ? "Processing..." : 
                mode === "login" ? "Sign in" : 
@@ -187,7 +248,7 @@ const Auth = () => {
               <button
                 onClick={handleGoogleSignIn}
                 disabled={loading}
-                className="w-full flex items-center justify-center py-2 px-4 border border-gray-300 rounded-md shadow-sm text-sm font-medium text-gray-700 bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-orange-500"
+                className="w-full flex items-center justify-center py-2 px-4 border border-gray-300 rounded-md shadow-sm text-sm font-medium text-gray-700 bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-orange-500 disabled:opacity-70"
               >
                 <Google className="h-5 w-5 text-red-500 mr-2" />
                 Google
@@ -203,7 +264,10 @@ const Auth = () => {
                 Don't have an account?{" "}
                 <button
                   type="button"
-                  onClick={() => setMode("signup")}
+                  onClick={() => {
+                    setMode("signup");
+                    setError("");
+                  }}
                   className="font-medium text-orange-500 hover:text-orange-400"
                 >
                   Sign up
@@ -212,7 +276,10 @@ const Auth = () => {
               <p className="mt-2 text-sm text-gray-600">
                 <button
                   type="button"
-                  onClick={() => setMode("resetPassword")}
+                  onClick={() => {
+                    setMode("resetPassword");
+                    setError("");
+                  }}
                   className="font-medium text-orange-500 hover:text-orange-400"
                 >
                   Forgot your password?
@@ -224,7 +291,10 @@ const Auth = () => {
               Already have an account?{" "}
               <button
                 type="button"
-                onClick={() => setMode("login")}
+                onClick={() => {
+                  setMode("login");
+                  setError("");
+                }}
                 className="font-medium text-orange-500 hover:text-orange-400"
               >
                 Sign in
@@ -234,7 +304,10 @@ const Auth = () => {
             <p className="text-sm text-gray-600">
               <button
                 type="button"
-                onClick={() => setMode("login")}
+                onClick={() => {
+                  setMode("login");
+                  setError("");
+                }}
                 className="font-medium text-orange-500 hover:text-orange-400"
               >
                 Back to sign in

@@ -143,3 +143,18 @@ REST_FRAMEWORK = {
         'rest_framework.permissions.AllowAny',
     ],
 }
+
+
+# SITE_URL = 'https://your-coffee-bar-site.com'
+
+# # Email Settings
+# EMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend'
+# EMAIL_HOST = 'smtp.gmail.com'
+# EMAIL_PORT = 587
+# EMAIL_USE_TLS = True
+# EMAIL_HOST_USER = 'your-email@gmail.com' 
+# EMAIL_HOST_PASSWORD = 'your-app-password'
+# DEFAULT_FROM_EMAIL = 'Coffee Bar <your-email@gmail.com>'
+
+# For development, you can use the console backend to see emails in the console
+# EMAIL_BACKEND = 'django.core.mail.backends.console.EmailBackend'

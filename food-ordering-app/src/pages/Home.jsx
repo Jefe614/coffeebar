@@ -20,7 +20,7 @@ const Home = () => {
         <div className="relative z-20 flex flex-col items-center justify-center h-full text-white p-6">
           <h1 className="text-4xl md:text-6xl font-bold text-center mb-4">Coffee Bar & Kitchen</h1>
           <p className="text-xl md:text-2xl max-w-lg text-center mb-8">
-            Handcrafted coffee and delicious meals made with love and quality ingredients
+          We give you the ultimate dining experience at a very affordable price.
           </p>
           <Link 
             to="/menu" 
@@ -118,7 +118,7 @@ const Home = () => {
                 <Room className="mr-2" />
                 <span className="font-semibold">Visit Us</span>
               </div>
-              <p className="mt-1">150 Park Row, New York, NY 10007</p>
+              <p className="mt-1">Kamiti corner opposite Quench</p>
             </div>
           </div>
         </div>
@@ -163,11 +163,11 @@ const Home = () => {
                 </li>
                 <li className="mt-2 flex items-center justify-center md:justify-start">
                   <Email className="mr-2 text-sm" />
-                  <span className="text-gray-300">info@coffeebar.com</span>
+                  <span className="text-gray-300">coffeebarandkitchen@gmail.com</span>
                 </li>
                 <li className="mt-2 flex items-center justify-center md:justify-start">
                   <Room className="mr-2 text-sm" />
-                  <span className="text-gray-300">150 Park Row, New York</span>
+                  <span className="text-gray-300">Kamiti corner opposite Quench</span>
                 </li>
               </ul>
             </div>
@@ -177,13 +177,13 @@ const Home = () => {
               <h5 className="uppercase mb-6 font-bold text-yellow-400">Hours</h5>
               <ul className="mb-4">
                 <li className="mt-2">
-                  <span className="text-gray-300">Mon - Fri: 7:00AM - 9:00PM</span>
+                  <span className="text-gray-300">Tue - Fri: 6:30AM - 9:00PM</span>
                 </li>
                 <li className="mt-2">
-                  <span className="text-gray-300">Saturday: 8:00AM - 10:00PM</span>
+                  <span className="text-gray-300">Saturday: 6:30AM - 9:00PM</span>
                 </li>
                 <li className="mt-2">
-                  <span className="text-gray-300">Sunday: 8:00AM - 8:00PM</span>
+                  <span className="text-gray-300">Sunday: 10:00AM - 10:00PM</span>
                 </li>
               </ul>
             </div>
@@ -196,19 +196,8 @@ const Home = () => {
             <div className="mb-4 md:mb-0">
               <p className="text-sm text-gray-400">© 2025 Coffee Bar & Kitchen. All Rights Reserved.</p>
             </div>
-            <div className="flex">
-              <a href="https://facebook.com" className="mx-2 hover:text-yellow-400">
-                <Facebook />
-              </a>
-              <a href="https://instagram.com" className="mx-2 hover:text-yellow-400">
-                <Instagram />
-              </a>
-              <a href="https://twitter.com" className="mx-2 hover:text-yellow-400">
-                <Twitter />
-              </a>
-              <a href="https://linkedin.com" className="mx-2 hover:text-yellow-400">
-                <LinkedIn />
-              </a>
+            <div>
+              <p className="text-sm text-gray-400">Made with ❤️ by <a href="https://www.linkedin.com/in/geoffrey-kimani-277107225/" className="hover:text-white transition-colors">Jefe</a></p>
             </div>
           </div>
         </div>

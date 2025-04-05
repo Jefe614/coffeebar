@@ -24,7 +24,6 @@ class OrderSerializer(serializers.ModelSerializer):
         read_only_fields = ['order_number', 'status', 'estimated_delivery']
     
     def validate(self, data):
-        # Ensure total_amount is provided and is a positive number
         if 'total_amount' not in data:
             raise serializers.ValidationError({"total_amount": "This field is required."})
         

@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import { useCart } from "../context/CartContext";
 import { useAuth } from "../context/AuthContext";
 import { 
@@ -17,6 +17,7 @@ const Navbar = () => {
   const [searchOpen, setSearchOpen] = useState(false);
   const { cartItems } = useCart();
   const { currentUser, signOut } = useAuth();
+  const navigate = useNavigate();
 
   const cartItemCount = cartItems.reduce((total, item) => total + item.quantity, 0);
 
@@ -25,6 +26,14 @@ const Navbar = () => {
       await signOut();
     } catch (error) {
       console.error("Error signing out:", error);
+    }
+  };
+
+  const handleProtectedNavigation = (path) => {
+    if (currentUser) {
+      navigate(path);
+    } else {
+      navigate(`/auth?redirect=${encodeURIComponent(path)}`);
     }
   };
 
@@ -49,32 +58,28 @@ const Navbar = () => {
           </div>
         </div>
       )}
-      
-      {/* Desktop Search Bar */}
-      {/* <div className="hidden md:flex items-center bg-white rounded-full px-3 py-1 md:w-auto">
-        <Search className="text-gray-600" />
-        <input 
-          type="text" 
-          placeholder="Search food..." 
-          className="outline-none px-2 py-1 w-40 md:w-64 text-gray-700"
-        />
-      </div> */}
 
       {/* Desktop Navigation */}
       <div className="hidden md:flex gap-6 items-center">
         <Link to="/menu" className="hover:text-yellow-300 font-semibold">Menu</Link>
-        <Link to="/track-order" className="mx-2 p-2 flex items-center">
+        <button 
+          onClick={() => handleProtectedNavigation('/track-order')} 
+          className="mx-2 p-2 flex items-center hover:text-yellow-300"
+        >
           <LocalShippingOutlined className="mr-1" />
           Track Order
-        </Link>
-        <Link to="/cart" className="relative">
+        </button>
+        <button 
+          onClick={() => handleProtectedNavigation('/cart')} 
+          className="relative"
+        >
           <ShoppingCartOutlined className="text-white text-2xl" />
           {cartItemCount > 0 && (
              <span className="absolute -top-2 -right-2 bg-orange-500 text-white text-xs rounded-full h-5 w-5 flex items-center justify-center">
              {cartItemCount}
            </span>
          )}
-        </Link>
+        </button>
         
         {currentUser ? (
           <div className="flex items-center gap-3">
@@ -101,9 +106,6 @@ const Navbar = () => {
 
       {/* Mobile Menu & Search Toggle */}
       <div className="md:hidden flex gap-4">
-        {/* <button onClick={() => setSearchOpen(!searchOpen)} className="p-1">
-          <Search className="text-white text-2xl" />
-        </button> */}
         <button onClick={() => setMenuOpen(!menuOpen)} className="p-1">
           {menuOpen ? <Close className="text-white text-2xl" /> : <Menu className="text-white text-2xl" />}
         </button>
@@ -120,25 +122,29 @@ const Navbar = () => {
             >
               Menu
             </Link>
-            <Link
-              to="/track-order"
-              onClick={() => setMenuOpen(false)}
-              className="flex items-center justify-center gap-2 py-3 border-b border-orange-400"
+            <button
+              onClick={() => {
+                setMenuOpen(false);
+                handleProtectedNavigation('/track-order');
+              }}
+              className="flex items-center justify-center gap-2 py-3 border-b border-orange-400 w-full"
             >
               <LocalShippingOutlined className="mr-2" />
               Track Order
-            </Link>
-            <Link 
-              to="/cart" 
-              className="flex items-center justify-center gap-2 py-3 border-b border-orange-400"
-              onClick={() => setMenuOpen(false)}
+            </button>
+            <button 
+              onClick={() => {
+                setMenuOpen(false);
+                handleProtectedNavigation('/cart');
+              }}
+              className="flex items-center justify-center gap-2 py-3 border-b border-orange-400 w-full"
             >
               <ShoppingCartOutlined className="text-white text-2xl" />
               <span>Cart</span>
               {cartItemCount > 0 && (
                 <span className="bg-red-600 text-white text-xs rounded-full px-2 py-1 ml-1">{cartItemCount}</span>
               )}
-            </Link>
+            </button>
             
             {currentUser ? (
               <div className="flex flex-col items-center gap-2 mt-2">
