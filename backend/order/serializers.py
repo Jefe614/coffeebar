@@ -1,5 +1,5 @@
 from rest_framework import serializers
-from .models import Order, OrderItem
+from .models import Order, OrderFeedback, OrderItem, OrderNotification
 
 class OrderItemSerializer(serializers.ModelSerializer):
     class Meta:
@@ -75,3 +75,39 @@ class OrderTrackingSerializer(serializers.ModelSerializer):
             'delivery_address'
         ]
         # read_only_fields = fields
+
+
+
+
+class AdminOrderSerializer(serializers.ModelSerializer):
+    items = OrderItemSerializer(many=True, read_only=True)
+    status_display = serializers.CharField(source='get_status_display', read_only=True)
+    customer_details = serializers.SerializerMethodField()
+    
+    class Meta:
+        model = Order
+        fields = '__all__'
+        read_only_fields = ('order_number', 'created_at', 'updated_at')
+    
+    def get_customer_details(self, obj):
+        return {
+            'name': obj.customer_name,
+            'email': obj.customer_email,
+            'phone': obj.customer_phone
+        }
+
+class OrderNotificationSerializer(serializers.ModelSerializer):
+    order_number = serializers.CharField(source='order.order_number', read_only=True)
+    order_status = serializers.CharField(source='order.status', read_only=True)
+    
+    class Meta:
+        model = OrderNotification
+        fields = '__all__'
+
+class OrderFeedbackSerializer(serializers.ModelSerializer):
+    staff_name = serializers.CharField(source='staff_member.user.get_full_name', read_only=True)
+    order_number = serializers.CharField(source='order.order_number', read_only=True)
+    
+    class Meta:
+        model = OrderFeedback
+        fields = '__all__'

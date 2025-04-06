@@ -7,6 +7,8 @@ from django.shortcuts import get_object_or_404
 from django.core.mail import send_mail
 from django.conf import settings
 from django.template.loader import render_to_string
+
+from .utils import notify_staff_new_order
 from .models import Order
 from .serializers import OrderSerializer, OrderTrackingSerializer
 
@@ -17,31 +19,26 @@ class OrderAPIView(APIView):
 
     def post(self, request):
         """Create a new order"""
-        # Process the incoming data to match serializer expectations
         data = request.data.copy()
         
-        # Handle the frontend data structure
-        # Extract items from the frontend format
+        
         if 'items' in data and isinstance(data['items'], list):
-            # Format items to match serializer expectations
-            # Make sure each item has required fields
             for item in data['items']:
                 if 'id' in item and 'item_id' not in item:
                     item['item_id'] = item['id']
         
-        # Make sure total_amount is properly set
         if 'total' in data and 'total_amount' not in data:
             data['total_amount'] = data['total']
             
-        # Set estimated delivery time
         data['estimated_delivery'] = (timezone.now() + timedelta(minutes=30)).isoformat()
 
         serializer = OrderSerializer(data=data)
         if serializer.is_valid():
             order = serializer.save()
             
-            # Send email notification with order details
             self.send_order_confirmation_email(order)
+            notify_staff_new_order(order)
+
             
             return Response({
                 'success': True,

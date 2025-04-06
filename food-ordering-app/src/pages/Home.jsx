@@ -1,5 +1,5 @@
 import { Link } from "react-router-dom";
-import { Facebook, Instagram, Twitter, LinkedIn, Room, Phone, Email } from "@mui/icons-material";
+import { Room, Phone, Email } from "@mui/icons-material";
 
 const Home = () => {
   return (
